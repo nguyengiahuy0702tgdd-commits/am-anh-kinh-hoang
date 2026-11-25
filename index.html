@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ám Ảnh Kinh Hoàng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="wet"><feTurbulence type="fractalNoise" baseFrequency="0.035 0.08" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3.5"/></filter></svg>
+<canvas id="c"></canvas>
+<div id="cross"></div>
+<div id="prompt"></div><div id="prompt2"></div><div id="cross2"></div><div id="split"></div>
+<div id="whisper"></div>
+<div id="fade"></div>
+<div id="lockHint" class="hidden">Nhấp chuột vào màn hình để điều khiển góc nhìn</div>
+<div id="msg" class="hidden">...</div>
+
+<div id="pad" class="hidden"><h4 id="padTitle">NHẬP MÃ</h4><div id="padDisplay">____</div><div id="padKeys"></div></div>
+<div id="note" class="hidden"></div>
+
+<div id="scare" class="hidden">
+  <svg viewBox="0 0 200 240">
+    <rect width="200" height="240" fill="#000"/>
+    <path d="M20 40 q80 -70 160 0 l10 200 h-180z" fill="#080808"/>
+    <ellipse cx="100" cy="118" rx="58" ry="80" fill="#cfc8bb"/>
+    <path d="M52 70 q48 -40 96 0 l-4 -20 q-44 -30 -88 0z" fill="#050505"/>
+    <ellipse cx="76" cy="105" rx="15" ry="20" fill="#000"/><ellipse cx="124" cy="105" rx="15" ry="20" fill="#000"/>
+    <circle cx="76" cy="108" r="3.5" fill="#f22"/><circle cx="124" cy="108" r="3.5" fill="#f22"/>
+    <path d="M70 124 q-2 30 4 60 M130 124 q3 25 -2 55" stroke="#6a0000" stroke-width="3" fill="none"/>
+    <ellipse cx="100" cy="168" rx="20" ry="36" fill="#000"/>
+    <path d="M86 150 l4 10 l4 -10 l4 10 l4 -10 l4 10 l4 -10" stroke="#bbb" stroke-width="2" fill="none"/>
+    <path d="M60 60 v120 M70 55 v90 M135 55 v100 M145 60 v130" stroke="#050505" stroke-width="4"/>
+  </svg>
+</div>
+
+<canvas id="bg"></canvas>
+<canvas id="menuFx"></canvas><div id="mwhisp"></div>
+<div id="menu" class="scr">
+  <div class="brand"><div class="logo">Ám Ảnh Kinh Hoàng</div><div class="tagline">Không ai trở về nguyên vẹn.</div></div>
+  <nav class="mnav"><a id="btnPlay">Bắt đầu</a><a id="btnRec">Kỷ lục</a><a id="btnSettings">Cài đặt</a><a id="btnHow">Điều khiển</a></nav>
+  <div class="foot">Nên chơi bằng tai nghe, trong phòng tối.<span id="fontNote" class="hidden"><br>Chưa tìm thấy font <b>Morta</b> trên máy — hãy cài font Morta, hoặc đặt file Morta (.otf/.woff) vào thư mục <b>fonts</b> cạnh file game.</span></div>
+</div>
+<div id="mapSel" class="scr hidden">
+  <div class="hdr">Chọn nơi chốn</div>
+  <nav id="mapCards" class="mnav list"></nav>
+  <div class="info">
+    <div id="mapName" class="mname"></div>
+    <div id="mapTag" class="mtag"></div>
+    <p id="mapInfo"></p>
+    <div id="mapRec" class="mrec"></div>
+    <div class="hdr2">Độ khó</div>
+    <div id="diffBtns" class="opts"></div>
+    <p id="diffDesc"></p>
+    <div class="hdr2">Người chơi</div>
+    <div id="modeBtns" class="opts"></div>
+    <p id="modeDesc" class="mdesc"></p>
+    <div id="netBox" class="hidden"><div class="netRow"><a id="netHostBtn">Tạo phòng</a><span class="dim">hoặc</span><input id="netCode" maxlength="6" placeholder="ID PHÒNG" autocomplete="off"><a id="netJoinBtn">Tham gia</a></div><div id="netStatus"></div></div>
+  </div>
+  <div class="sbar"><a id="mapBack">Quay lại</a><a id="startBtn" class="go">Vào game</a></div>
+</div>
+<div id="settings" class="scr hidden">
+  <div class="hdr">Cài đặt</div>
+  <div id="setList"></div>
+  <div class="sbar"><a id="setBack">Xong</a></div>
+</div>
+<div id="howto" class="scr hidden">
+  <div class="hdr">Điều khiển</div>
+  <div class="keys">
+    <span class="k">W A S D</span><span>Di chuyển</span>
+    <span class="k">Chuột</span><span>Nhìn xung quanh</span>
+    <span class="k">Shift</span><span>Chạy — gây tiếng động</span>
+    <span class="k">E</span><span>Tương tác, nhặt đồ, trốn</span>
+    <span class="k">F</span><span>Bật / tắt đèn pin</span>
+    <span class="k">M</span><span>Bản đồ</span>
+    <span class="k">Tab</span><span>Xem / ẩn danh sách nhiệm vụ</span>
+    <span class="k">N</span><span>Sổ ghi chép</span>
+    <span class="k">C</span><span>Ngồi / đứng dậy (đi rón rén, ma khó nghe thấy)</span>
+    <span class="k">Space</span><span>Nhảy</span>
+    <span class="k">Hai người</span><span>Chọn "Hai người (online)" → Tạo phòng / nhập ID phòng</span>
+    <span class="k">Esc</span><span>Tạm dừng</span>
+  </div>
+  <div class="sbar"><a id="howBack">Quay lại</a></div>
+</div>
+<div id="records" class="scr hidden">
+  <div class="hdr">Kỷ lục thời gian</div>
+  <div id="recBox"></div>
+  <div class="sbar"><a id="recBack">Quay lại</a><a id="recClear">Xóa kỷ lục</a></div>
+</div>
+<div id="pause" class="scr dim hidden">
+  <div class="hdr">Tạm dừng</div>
+  <nav class="mnav"><a id="pResume">Tiếp tục</a><a id="pSettings">Cài đặt</a><a id="pMenu">Thoát ra menu</a></nav>
+</div>
+<div id="vig"></div>
+<div id="hudx" class="hidden">
+  <div id="area"></div>
+  <div id="obj"></div>
+  <div id="timer"></div>
+  <div id="tasks"><div class="th">Nhiệm vụ <small>Tab — ẩn</small></div><ul id="taskList"></ul></div>
+  <div id="tut" class="hidden"></div>
+  <div id="playClock"></div>
+  <div id="faceHint" class="hidden">GỠ NÓ RA! Bấm <b>E</b> liên tục hoặc lắc chuột thật mạnh</div>
+  <div id="taskHint"><span class="kc">Tab</span>Nhiệm vụ</div>
+  <div class="stats" id="st1"><div class="who">Người chơi 1</div><div class="sr hp"><b>Máu</b><span><i></i></span></div><div class="sr bt"><b>Đèn pin</b><span><i></i></span></div><div class="sr sm"><b>Thể lực</b><span><i></i></span></div></div>
+  <div class="stats p2 hidden" id="st2"><div class="who">Người chơi 2</div><div class="sr hp"><b>Máu</b><span><i></i></span></div><div class="sr bt"><b>Đèn pin</b><span><i></i></span></div><div class="sr sm"><b>Thể lực</b><span><i></i></span></div></div>
+</div>
+<div id="journal" class="hidden">
+  <div class="jt">Sổ tay</div>
+  <div class="jl">Việc cần làm</div><div id="jObj"></div>
+  <div class="jl">Đồ mang theo</div><ul id="invList"></ul>
+  <div class="jf">Tab — đóng sổ</div>
+</div>
+<canvas id="mapView" class="hidden"></canvas>
+<div id="fps" class="hidden"></div>
+
+<div id="down1" class="down hidden">Đã gục ngã<small></small></div><div id="down2" class="down hidden">Đã gục ngã<small></small></div>
+<div id="story" class="hidden"><div class="st"></div><div class="sp"></div><div class="sk"></div></div>
+<div id="cine" class="hidden"><div class="cfade"></div><div class="cstamp"></div><div class="cskip">Space: cảnh tiếp · Esc: bỏ qua</div><div class="csub"></div><div class="ccard"></div></div>
+<div id="toast"></div>
+<div id="win" class="overlay hidden"><h1 id="winTitle"></h1><p id="winText"></p><button onclick="backToMenu()">Về menu chính</button></div>
+<div id="lose" class="overlay hidden"><h1>NÓ ĐÃ BẮT ĐƯỢC BẠN</h1><p id="loseText">"Giờ anh sẽ ở lại chơi với em mãi mãi..."</p><button onclick="backToMenu()">Về menu chính</button></div>
+<div id="loading">Đang tải...</div>
+
+<!-- Mã game: nạp ĐÚNG thứ tự (file sau dùng/ghi đè hàm của file trước) -->
+<script src="js/01-cau-hinh.js"></script>
+<script src="js/02-texture.js"></script>
+<script src="js/03-ban-do.js"></script>
+<script src="js/04-giao-dien-co-ban.js"></script>
+<script src="js/05-am-thanh.js"></script>
+<script src="js/06-con-ma.js"></script>
+<script src="js/07-cau-do.js"></script>
+<script src="js/08-dieu-khien.js"></script>
+<script src="js/09-do-hoa-webgl.js"></script>
+<script src="js/10-mo-hinh-3d.js"></script>
+<script src="js/11-vong-lap-khoi-dong.js"></script>
+<script src="js/12-map-trong-rung.js"></script>
+<script src="js/13-ke-thu-dung-chung.js"></script>
+<script src="js/14-map-lau-dai.js"></script>
+<script src="js/15-map-nghia-trang.js"></script>
+<script src="js/16-map-nha-may.js"></script>
+<script src="js/17-hoat-anh-nhan-vat.js"></script>
+<script src="js/18-giao-dien-menu-hud.js"></script>
+<script src="js/19-kien-truc.js"></script>
+<script src="js/20-choi-2-nguoi.js"></script>
+<script src="js/21-nhan-vat-3d-phim-mo-dau.js"></script>
+<script src="js/22-choi-online.js"></script>
+<script src="js/23-bo-cuc-do-dac.js"></script>
+<script src="js/24-chu-chiller.js"></script>
+<script src="js/25-nhen-dao-dien-hu-doa.js"></script>
+<script src="js/26-hu-dung-luc.js"></script>
+<script src="js/27-va-cham-cua-so.js"></script>
+<script src="js/28-mat-ma-do-hoa.js"></script>
+<script src="js/29-doi-qua-ma-bay.js"></script>
+<script src="js/30-nhac-menu-be-mat.js"></script>
+<script src="js/31-ten-khu-vuc-tu-mo.js"></script>
+<script src="js/32-ban-do-truc-tiep.js"></script>
+<script src="js/33-cai-dat-nhac-menu.js"></script>
+<script src="js/34-ky-luc.js"></script>
+<script src="js/35-map-benh-vien.js"></script>
+<script src="js/36-tieng-ma-noi.js"></script>
+<script src="js/37-ma-gao-het-den-pin.js"></script>
+<script src="js/38-phim-cot-truyen.js"></script>
+<script src="js/39-kich-ban-phim.js"></script>
+<script src="js/40-menu-doc-4k.js"></script>
+<script src="js/41-ngay-dem-bay-do.js"></script>
+<script src="js/42-muot-hon.js"></script>
+<script src="js/43-quet-3d-pbr.js"></script>
+<script src="js/44-giao-dien-3d.js"></script>
+</body>
+</html>
