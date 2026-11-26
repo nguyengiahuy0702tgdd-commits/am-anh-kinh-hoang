@@ -76,7 +76,7 @@ function netRemoteAct(m) {
   withRemote(() => {
     if (m.hide) return hide();
     if (m.si != null) { const s = FLOORS[m.f]?.sprites[m.si]; if (s && s.act && !s.taken && SPRITE_ACTS[s.act]) { label = SPRITE_NAMES[s.act] || ""; SPRITE_ACTS[s.act](s); } }
-    else if (ACTIONS[m.c]) { label = NAMES[m.c] || ""; ACTIONS[m.c]({ c: m.c, x: m.x, y: m.y }); }
+    else if (ACTIONS[m.c]) { label = NAMES[m.c] || ""; const F0 = F, Fr = FLOORS[m.f || P2.f] || F; F = Fr; try { ACTIONS[m.c]({ c: m.c, x: m.x, y: m.y }); } finally { if (F === Fr) F = F0; if (Fr !== F0) Fr._baseDirty = true; } }   // làm trên đúng tầng của đồng đội
   });
   if (label) toast("Đồng đội: " + label);
 }
@@ -85,7 +85,6 @@ function netApplySnap(m) {
   const list = m.g; for (let i = 0; i < list.length; i++) { const src = list[i], g = ghosts[i]; if (!g) ghosts[i] = { ...src, nx: src.x, ny: src.y }; else { const { x, y, ...rest } = src; Object.assign(g, rest); g.nx = x; g.ny = y; } }
   ghosts.length = list.length;
   const y = m.you; if (y.hp < P1.hp) hurt = 1; Object.assign(P1, { hp: y.hp, dead: y.dead, rev: y.rev }); S.clockMin = m.cm ?? S.clockMin; S.woke = m.woke;
-  if (m.fid && m.fid !== F.id && !S.paused && FLOORS[m.fid]) { F = FLOORS[m.fid]; refreshWalls(); }
 }
 function netTick(dt) {
   if (!NET.ok) return;
@@ -113,7 +112,7 @@ function act(p) {
     if (player.hidden) { hide(); netSend({ t: "act", hide: 1 }); return; }
     aimed = p.aim; aimedSprite = p.aimS; if (aimed || aimedSprite) TUT.used = 1;
     if (aimedSprite) { const s = aimedSprite, si = F.sprites.indexOf(s), fid = F.id; SPRITE_ACTS[s.act](s); netSend({ t: "act", si, f: fid }); }
-    else if (aimed) { const c = aimed; ACTIONS[c.c](c); netSend({ t: "act", c: c.c, x: c.x, y: c.y }); }
+    else if (aimed) { const c = aimed, fid = F.id; ACTIONS[c.c](c); netSend({ t: "act", c: c.c, x: c.x, y: c.y, f: fid }); }
   });
 }
 // ---- Vòng lặp mạng ----
@@ -124,11 +123,12 @@ function gameStep(dt) {
   if (COOP && P2) { const k = Math.min(1, dt * 12); if (P2.nx != null) { P2.x += (P2.nx - P2.x) * k; P2.y += (P2.ny - P2.y) * k; P2.a += angTo(P2.a, P2.na) * k; } }
   if (!NET.on || NET.host || !NET.ok) {
     if (COOP && P2 && NET.ok) {
-      const alive = players().filter(p => !p.dead && p.f === F.id);
-      const dm = p => { let m = 99; for (const g of ghosts) if (g.floor === F.id) m = Math.min(m, Math.hypot(g.x - p.x, g.y - p.y)); return m; };
+      const alive = players().filter(p => !p.dead);   // mỗi người có thể ở một tầng khác nhau
+      const dm = p => { let m = 99; for (const g of ghosts) if (g.floor === (p.f || F.id)) m = Math.min(m, Math.hypot(g.x - p.x, g.y - p.y)); return m; };
       let tg = S.target && alive.includes(S.target) ? S.target : alive[0] || P1;
       if (alive.length > 1) { const o = tg === P1 ? P2 : P1; if (dm(o) < dm(tg) - 1.5) tg = o; }
-      S.target = tg; player = tg; try { MD.update(dt); } finally { player = P1; }
+      const Fh = F, Ft = FLOORS[tg.f] || F;
+      S.target = tg; player = tg; F = Ft; try { MD.update(dt); } finally { player = P1; if (F === Ft) F = Fh; }
       revive(dt);
     } else MD.update(dt);
     tasksTick(dt);
@@ -156,9 +156,10 @@ function setupCoop() {
   $("st2").classList.toggle("hidden", !COOP); $("st1").querySelector(".who").textContent = "Bạn"; $("st2").querySelector(".who").textContent = "Đồng đội";
 }
 function travel(to, x, y, a) {
+  if (REMOTE && P2) { Object.assign(P2, { x, y, a, nx: x, ny: y, na: a, f: to, hidden: false }); return; }   // đồng đội đi cầu thang: chỉ đồng đội đổi tầng
   S.paused = true; document.exitPointerLock?.(); $("fade").style.opacity = 1; for (let i = 0; i < 6; i++) noise(.08, 160, .3, .8, i * .18);
   setTimeout(() => {
-    F = FLOORS[to]; Object.assign(P1, { x, y, a, pitch: 0, hidden: false, f: to }); if (COOP && P2) { placeBeside(P1, { x, y, a }); Object.assign(P2, { f: to }); }
+    F = FLOORS[to]; Object.assign(P1, { x, y, a, pitch: 0, hidden: false, f: to }); if (COOP && P2 && !NET.on) { placeBeside(P1, { x, y, a }); Object.assign(P2, { f: to }); }
     F.arriveX = x; F.arriveY = y; refreshWalls(); $("fade").style.opacity = 0; S.paused = false; showArea(F.name);
   }, 700);
 }

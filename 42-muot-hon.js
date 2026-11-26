@@ -36,9 +36,13 @@ buildFloorMesh = function (f) {
 };
 refreshWalls = function () { WT = WALL_TEX(); WT["Ø"] = T.slamDoor; if (gl && LAYER.size) { for (const f of Object.values(FLOORS)) f._baseDirty = true; buildFloorMesh(F); } };   // các tầng khác dựng lại khi bước tới
 // Tự điều chỉnh độ phân giải nhanh, mục tiêu 60 khung hình/giây ổn định
+// Bản 36: vừa vào game (kể cả lúc chiếu phim mở đầu) bắt đầu ở độ phân giải vừa phải rồi mới nâng dần → hết giật lúc mới vào
 perfTick = function (dt) {
-  if (!S.started || S.paused) return; PERF.base ??= SCALE; PERF.acc += dt; PERF.n++; PERF.t += dt; if (PERF.t < .75) return;
-  const avg = PERF.acc / PERF.n; PERF.acc = PERF.n = PERF.t = 0; const lo = SET.quality === "nhanh" ? .4 : .5;
-  if (avg > .0185 && SCALE > lo) SCALE = Math.max(lo, SCALE * (avg > .03 ? .8 : .9));
-  else if (avg < .0135 && SCALE < PERF.base) SCALE = Math.min(PERF.base, SCALE * 1.05);
+  const live = (S.started && !S.paused) || CUT.on; if (!live) return;
+  if (PERF.base == null) { PERF.base = SCALE; SCALE = Math.min(SCALE, 1); PERF.warm = performance.now(); PERF.acc = PERF.n = PERF.t = 0; }
+  const warm = performance.now() - PERF.warm < 8000, lo = SET.quality === "nhanh" ? .4 : .5;
+  PERF.acc += dt; PERF.n++; PERF.t += dt; if (PERF.t < (warm ? .3 : .75)) return;
+  const avg = PERF.acc / PERF.n; PERF.acc = PERF.n = PERF.t = 0;
+  if (avg > .0185 && SCALE > lo) SCALE = Math.max(lo, SCALE * (avg > .03 ? (warm ? .7 : .8) : .9));
+  else if (avg < .0135 && SCALE < PERF.base) SCALE = Math.min(PERF.base, SCALE * (warm ? 1.03 : 1.05));
 };

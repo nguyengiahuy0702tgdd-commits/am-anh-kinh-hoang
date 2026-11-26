@@ -6,7 +6,7 @@
 const HZ_FONT = '"Chiller", "Grenze Gotisch", serif';
 const HZ_SEL = ".logo, .hdr, .mname, .mnav a, .sbar a, #area, .overlay h1, #story .st, #loading .ln, #tasks .th, .netRow a";
 const HZ = { on: false, ctx: document.createElement("canvas").getContext("2d"), cache: {}, busy: false };
-(() => { const g = HZ.ctx; g.font = "60px monospace"; const a = g.measureText("ăẠwmiQ đÐ").width; g.font = '60px "Chiller", monospace'; const b = g.measureText("ăẠwmiQ đÐ").width; HZ.on = Math.abs(a - b) > 1; })();
+HZ.on = false;   // bản 37: mọi máy dùng chung font Texturina (có sẵn dấu tiếng Việt) thay cho Chiller
 const HZ_MARK = { "́": "ac", "̀": "gr", "̉": "ho", "̃": "ti", "̣": "db", "̂": "ci", "̆": "br", "̛": "hn" };
 const latin1 = c => c.length === 1 && c.charCodeAt(0) <= 0xFF;
 function hzMetric(ch) {

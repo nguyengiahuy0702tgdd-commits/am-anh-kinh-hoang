@@ -14,7 +14,7 @@ void main(){ vec3 p = aPos, nn = aN;
   vPos=p; vUV=aUV; vN=nn; vL=aL; gl_Position=uVP*vec4(p,1.); }`;
 const FS3 = `#version 300 es
 precision highp float; precision highp sampler2DArray;
-uniform sampler2DArray uTex, uEm, uSA, uSN, uMA, uMN; uniform vec3 uCam, uFlDir, uFogC, uMoonDir, uMoonC; uniform float uFl, uAmb, uFog, uSky, uPOM, uDay; uniform int uNL;
+uniform sampler2DArray uTex, uEm, uSA, uSN, uSR, uMA, uMN, uMR; uniform vec3 uCam, uFlDir, uFogC, uMoonDir, uMoonC; uniform float uFl, uAmb, uFog, uSky, uPOM, uDay; uniform int uNL;
 uniform vec4 uLP[10]; uniform vec4 uLC[10];
 in vec3 vPos; in vec2 vUV; in vec3 vN; flat in float vL; out vec4 o;
 // Phản xạ ánh sáng kiểu vật lý (GGX): độ nhám quyết định bề mặt bóng hay mờ, kim loại phản chiếu màu của chính nó
@@ -26,7 +26,7 @@ void main(){
   vec3 Nn = normalize(vN); vec3 q1 = dFdx(vPos), q2 = dFdy(vPos); vec2 t1 = dFdx(vUV), t2 = dFdy(vUV);
   vec2 uv = vUV; float dc = length(uCam - vPos);
   float uvs = length(t1) / max(length(q1), 1e-5);
-  bool pb = vL > 999.5, sf = vL > 1999.5; float pl = vL - (sf ? 2000. : 1000.); vec4 tn = vec4(.5, .5, .7, 0.);   // pb: vật liệu PBR (ảnh quét thật)
+  bool pb = vL > 999.5, sf = vL > 1999.5; float pl = vL - (sf ? 2000. : 1000.); vec4 tn = vec4(.5, .5, 1., 1.), tr = vec4(1., .78, 0., 1.);   // pb: vật liệu PBR (ảnh quét thật)
   if (!pb && uPOM > 0. && dc < 5.5 && uvs < 2.2) {   // bề mặt có chiều sâu thật (parallax): mạch gạch, khe ván lõm xuống
     vec3 q2p = cross(q2, Nn), q1p = cross(Nn, q1); vec3 Tg = q2p * t1.x + q1p * t2.x, Bt = q2p * t1.y + q1p * t2.y; float im = inversesqrt(max(max(dot(Tg, Tg), dot(Bt, Bt)), 1e-12));
     vec3 Vw = normalize(uCam - vPos); vec3 Vt = vec3(dot(Vw, Tg * im), dot(Vw, Bt * im), dot(Vw, Nn));
@@ -34,11 +34,11 @@ void main(){
       for (int i = 0; i < 10; i++) { hcur = 1. - dot(textureLod(uTex, vec3(uv, vL), 2.).rgb, vec3(.3, .59, .11)) * 1.6; if (lay >= hcur) break; uv += stp; lay += dl; } }
   }
   vec4 tc;
-  if (pb) { if (sf) { tc = textureGrad(uSA, vec3(uv, pl), t1, t2); tn = textureGrad(uSN, vec3(uv, pl), t1, t2); } else { tc = textureGrad(uMA, vec3(uv, pl), t1, t2); tn = textureGrad(uMN, vec3(uv, pl), t1, t2); } }
+  if (pb) { vec3 q = vec3(uv, pl); if (sf) { tc = textureGrad(uSA, q, t1, t2); tn = textureGrad(uSN, q, t1, t2); tr = textureGrad(uSR, q, t1, t2); } else { tc = textureGrad(uMA, q, t1, t2); tn = textureGrad(uMN, q, t1, t2); tr = textureGrad(uMR, q, t1, t2); } }   // màu · pháp tuyến · [bóng AO, nhám, kim loại]
   else tc = texture(uTex, vec3(uv, vL));
   if (tc.a < .5) discard;
   if (abs(vL - uSky) < .5) { vec3 dsk = mix(vec3(.82, .86, .9), vec3(.4, .6, .88), clamp((vPos.y - uCam.y) / 22., 0., 1.)); o = vec4(mix(tc.rgb, dsk, uDay), 1.); return; }   // bầu trời (ban ngày trong phim)
-  vec3 base = pow(tc.rgb, vec3(2.2));
+  vec3 base = pow(tc.rgb, vec3(2.2)); if (pb) base *= mix(.35, 1., tr.r);
   if (uDay > 0.) { float bl = step(base.g * 2.4, base.r) * step(base.b * 2.4, base.r) * step(base.r, .5); vec3 cl = vec3(dot(base, vec3(.3, .59, .11))) * vec3(1.2, 1.1, .95) + .02; base = mix(base, cl, bl * uDay); }   // ngày xưa: chưa có vết máu
   float hgt = dot(texture(uTex, vec3(uv, vL), 2.5).rgb, vec3(.3,.59,.11));
   vec3 N = normalize(vN); if (pb && dot(N, uCam - vPos) < 0.) N = -N;
@@ -51,7 +51,7 @@ void main(){
   vec3 r1 = cross(dpy, N), r2 = cross(N, dpx); float det = dot(dpx, r1);
   N = normalize(abs(det) * N - sign(det) * (dhx * r1 + dhy * r2) * .5);        // bề mặt sần
   }
-  float rgh = pb ? clamp(tn.z, .06, 1.) : .55, mtl = pb ? tn.w : 0.; vec3 F0 = mix(vec3(.04), base, mtl), dif = pb ? base * (1. - mtl) : base;
+  float rgh = pb ? clamp(tr.g, .06, 1.) : .55, mtl = pb ? tr.b : 0.; vec3 F0 = mix(vec3(.04), base, mtl), dif = pb ? base * (1. - mtl) : base;
   vec3 Ld = uCam - vPos; float d = length(Ld); vec3 L = Ld / d, V = L;
   float cosA = dot(-L, uFlDir), foc = uFl > 0. ? mix(.3, 1., smoothstep(.66, .93, cosA)) : 1.;   // bật đèn pin: xung quanh tối đi, chỉ vùng đèn sáng rõ
   vec3 col = (dif * mix(uAmb, .6, uDay) * mix(vec3(1.), vec3(1.12, 1.02, .88), uDay) + dif * uMoonC * (max(dot(N, uMoonDir), 0.) * .8 + .2) * (1. + uDay * 1.6) + (pb ? F0 * (uAmb + dot(uMoonC, vec3(.33))) * (1. - rgh * .7) : vec3(0.))) * foc;

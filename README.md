@@ -1,42 +1,17 @@
 # Ám Ảnh Kinh Hoàng
 
-Game kinh dị giải đố 3D góc nhìn thứ nhất chạy ngay trên trình duyệt (WebGL2), 6 map:
-Căn Nhà Số 13 · Trong Rừng · Lâu Đài Bị Bỏ Hoang · Nghĩa Trang Lúc 0h Đêm · Nhà Máy Xí Nghiệp · Bệnh Viện Dị Nhân (map khó).
+Game kinh dị giải đố 3D góc nhìn thứ nhất (WebGL2), 6 map.
 
-> ⚠️ Nội dung kinh dị, khuyến cáo 16+. Nên chơi bằng tai nghe, trong phòng tối.
+## Cách chạy
 
-**▶ Chơi ngay:** `https://<tên-tài-khoản>.github.io/<tên-repo>/` *(sửa lại sau khi bật GitHub Pages)*
+Nhấp đúp `index.html` (Chrome/Edge) là chơi được.
 
-## Đưa lên GitHub & bật link chơi (GitHub Pages)
-
-1. Vào github.com → **New repository** → đặt tên (vd `am-anh-kinh-hoang`) → chọn **Public** → **Create repository**.
-2. Bấm **uploading an existing file** → kéo **toàn bộ nội dung** thư mục này vào (gồm `index.html`, `README.md`, `.nojekyll`, thư mục `css`, `js`, `assets`) → **Commit changes**.
-   *(File `.nojekyll` bị ẩn trên Windows thì cũng không sao, không bắt buộc.)*
-3. Vào **Settings → Pages** → mục *Branch* chọn `main` và `/ (root)` → **Save**.
-4. Đợi 1–2 phút, tải lại trang Settings → Pages sẽ hiện link `https://<tên-tài-khoản>.github.io/<tên-repo>/`. Sửa link ở đầu README này cho đúng.
-
-**Cập nhật game sau này:** vào repo → **Add file → Upload files** → kéo file đã sửa vào (cùng tên, cùng thư mục) → **Commit**. Link chơi tự cập nhật sau 1–2 phút.
-
-## Cách chơi
-
-- **W A S D** di chuyển · **Chuột** nhìn · **Shift** chạy · **E** tương tác/trốn · **F** đèn pin · **M** bản đồ · **Tab** nhiệm vụ · **N** sổ ghi chép · **C** ngồi · **Space** nhảy · **Esc** tạm dừng.
-- Chơi 2 người online: chọn **Hai người (online)** → một người **Tạo phòng**, người kia nhập **ID phòng**.
-
-## Đồ họa 3D thật
-
-Vào game là tự bật: game tải đúng những vật liệu PBR và đồ vật quét 3D mà map đang chơi cần từ **Poly Haven** (lần đầu cần mạng, góc phải dưới hiện %), sau đó trình duyệt lưu lại nên lần sau vào gần như tức thì.
-
-- **Cài đặt → Đồ họa 3D thật**: *Tắt* (máy yếu) / *Bật* / *Siêu nét* (máy mạnh) — đổi được ngay khi đang chơi.
-- **Cài đặt → Nền menu 3D**: bật/tắt cảnh 3D phía sau menu.
-- Không tải được (mất mạng…) thì game tự dùng đồ họa vẽ bằng code, vẫn chơi bình thường.
-
-## Chạy trên máy (không cần GitHub)
-
-Nhấp đúp `index.html` (Chrome/Edge). Sửa code bằng VS Code: dùng tiện ích **Live Server** để vừa sửa vừa xem.
-
-## Nguồn tài nguyên
-
-Vật liệu & mô hình 3D: **[Poly Haven](https://polyhaven.com)** — giấy phép **CC0** (miễn phí, dùng cả mục đích thương mại). Powered by Poly Haven.
+**Đồ họa 3D thật** (vật liệu PBR + đồ vật quét 3D từ Poly Haven) **tự bật khi vào game**:
+- Lần đầu cần mạng: game tự tải đúng những vật liệu/mô hình mà map đang chơi cần (vài chục MB), vừa chơi vừa tải, góc phải dưới hiện "%".
+- Tải xong được trình duyệt lưu lại → lần sau vào gần như tức thì.
+- **Cài đặt → "Đồ họa 3D thật"**: *Tắt* (máy yếu) / *Bật* / *Siêu nét* (máy mạnh). Đổi được ngay cả khi đang chơi (Esc → Cài đặt). Lần đầu game tự chọn theo sức máy.
+- **Cài đặt → "Nền menu 3D"**: bật/tắt cảnh 3D phía sau menu.
+- Muốn chơi không cần mạng: chạy `TAI-TAI-NGUYEN.bat` một lần rồi mở game bằng `CHAY-GAME.bat` (game sẽ lấy tài nguyên trong thư mục `assets/`).
 
 ## Cấu trúc
 
@@ -45,7 +20,10 @@ am-anh-kinh-hoang/
 ├── index.html        Khung trang (các màn hình, nút bấm) + nạp CSS và JS
 ├── css/style.css     Toàn bộ giao diện
 ├── js/               Mã game, chia theo phần
-└── assets/           danh-sach.json: danh sách vật liệu & mô hình Poly Haven mà game dùng
+├── assets/           Tài nguyên quét 3D (danh-sach.json = danh sách cần tải; manifest.json do file tải tạo ra)
+├── tools/            tai-tai-nguyen.ps1 (tải từ Poly Haven), may-chu.ps1 (máy chủ web chạy game)
+├── TAI-TAI-NGUYEN.bat
+└── CHAY-GAME.bat
 ```
 
 | File | Nội dung |
@@ -146,7 +124,7 @@ Nguồn: **[Poly Haven](https://polyhaven.com)** — mô hình quét/dựng th�
 
 **Thêm hoặc đổi đồ vật:**
 1. Tìm đồ trên polyhaven.com, lấy id ở cuối link (vd `polyhaven.com/a/Rockingchair_01` → `Rockingchair_01`).
-2. Thêm id vào `assets/danh-sach.json` (mục `models` hoặc `textures`) để ghi nhớ.
+2. Thêm id vào `assets/danh-sach.json` (mục `models` hoặc `textures`), chạy lại `TAI-TAI-NGUYEN.bat`.
 3. Trong `js/43-quet-3d-pbr.js`: khai báo tên gọn ở `SCAN_MODELS`, rồi chỉ định đồ vật nào của game dùng nó ở `SCAN_LAYOUT` (vật liệu tường/sàn ở `SCAN_SURF`).
 
-Muốn ảnh nét hơn: trong game chọn **Cài đặt → Đồ họa 3D thật → Siêu nét**.
+Muốn ảnh nét hơn: đổi `"do_phan_giai": "1k"` thành `"2k"` trong `danh-sach.json` rồi tải lại (nặng gấp ~4 lần).
