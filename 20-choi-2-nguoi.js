@@ -3,8 +3,8 @@
 //      cốt truyện mở đầu/kết thúc · hướng dẫn · HUD máu-đèn-thể lực
 // =====================================================================
 const P1 = player; let P2 = null, COOP = false, MODE = "single", TASKS = [];
-const players = () => COOP ? [P1, P2] : [P1];
-const pname = p => !COOP || p === P1 ? "Bạn" : "Đồng đội";
+const players = () => COOP ? [P1, ...MATES] : [P1];
+const pname = p => !COOP || p === P1 ? "Bạn" : p && p.slot != null ? `Người ${p.slot + 1}` : "Đồng đội";
 const pickR = a => a[Math.floor(Math.random() * a.length)];
 const safeG = fn => { try { return !!fn(); } catch (e) { return false; } };
 function withPlayer(p, fn) { const prev = player; player = p; try { return fn(); } finally { player = prev; } }
@@ -32,7 +32,7 @@ function loop(now) {
   if (SET.fps) { fpsAcc = (fpsAcc || 0) * .95 + .05 / Math.max(dt, .001); if (fpsN % 15 === 0) $("fps").textContent = Math.round(fpsAcc) + " FPS"; }
   for (const [p, id, key] of [[P1, "prompt", "E"], [P2, "prompt2", "Enter"]]) {
     if (!p) continue;
-    const lbl = p.dead ? "" : p.hidden ? "Ra khỏi tủ" : S.paused ? "" : p.aimS ? SPRITE_NAMES[p.aimS.act] : p.aim ? NAMES[p.aim.c] : "";
+    const lbl = p.dead ? "" : p.hidden ? "Ra khỏi tủ" : S.paused ? "" : p.aimS ? (p.aimS.label || SPRITE_NAMES[p.aimS.act]) : p.aim ? NAMES[p.aim.c] : "";
     const pr = $(id); if (pr._l !== lbl) { pr._l = lbl; pr.innerHTML = lbl ? `<span class="key">${key}</span>${lbl}` : ""; }
   }
   $("lockHint").classList.toggle("hidden", !S.started || S.paused || document.pointerLockElement === cv);
@@ -49,8 +49,8 @@ function hud() {
   const g = goalText().replace(/^Mục tiêu: /, ""); $("jObj").textContent = g || "Không có ghi chép.";
   let hr = 1; for (const p of players()) if (!p.dead) hr = Math.min(hr, p.hp / D.hp);
   $("vig").style.opacity = Math.min(1, (1 - hr) * 1.15 + hurt * .7); $("vig").classList.toggle("low", players().some(p => p.hp === 1 && !p.dead) && D.hp > 1);
-  statBox($("st1"), P1); if (COOP) statBox($("st2"), P2);
-  for (const [p, id] of [[P1, "down1"], [P2, "down2"]]) { const on = COOP && p?.dead; $(id).classList.toggle("hidden", !on); if (on) $(id).querySelector("small").textContent = p.rev > 0 ? `Đang được kéo dậy... ${Math.min(100, Math.round(p.rev / 2.5 * 100))}%` : "Đồng đội hãy tới đứng sát bên để kéo dậy"; }
+  statBox($("st1"), P1); if (COOP) MATES.forEach((m, i) => { const el = $("st" + (i + 2)); if (!el) return; statBox(el, m); const w = el.querySelector(".who"), tx = `Người ${m.slot + 1}` + (m.gone ? " · mất kết nối" : m.dead ? (m.rev > 0 ? ` · đang kéo dậy ${Math.min(100, Math.round(m.rev / 2.5 * 100))}%` : " · ĐÃ GỤC") : m.f && m.f !== F.id ? " · tầng khác" : ""); if (w._t !== tx) { w._t = tx; w.textContent = tx; } el.classList.toggle("dead", !!(m.dead || m.gone)); });
+  for (const [p, id] of [[P1, "down1"]]) { const on = COOP && p?.dead; $(id).classList.toggle("hidden", !on); if (on) $(id).querySelector("small").textContent = p.rev > 0 ? `Đang được kéo dậy... ${Math.min(100, Math.round(p.rev / 2.5 * 100))}%` : "Đồng đội hãy tới đứng sát bên để kéo dậy"; }
   if (MAPID === "cemetery" && S.started) { const mm = Math.min(180, Math.floor(S.clockMin)); $("timer").textContent = `0${Math.floor(mm / 60)}:${pad2(mm % 60)}`; if (mm >= 180 && !S.paused) lose("3 giờ sáng. Mọi nấm mộ cùng mở toang... Bạn sẽ ở lại đây mãi mãi."); }
   else if (D.time && S.started) { const left = Math.max(0, D.time - (Date.now() - S.started) / 1000); $("timer").textContent = `${Math.floor(left / 60)}:${pad2(Math.floor(left % 60))}`; if (left <= 0 && !S.paused) lose("Trời đã sáng... nhưng bạn sẽ không bao giờ thấy nó nữa."); }
   if (t > (S.tpT || 0)) { S.tpT = t + .3; renderTasks(); }
@@ -323,7 +323,7 @@ function toggleMap(force) {
   drawMapLabels(g, f, k);
   g.fillStyle = "#3a1a0a"; g.font = `${Math.max(15, k * 1.7)}px "Charm", serif`; g.textAlign = "left"; g.fillText(f.name, k * 1.2, k * 1.4);
   c._k = k; c._f = f; c._base = (() => { const o = document.createElement("canvas"); o.width = c.width; o.height = c.height; const og = o.getContext("2d"); og.drawImage(c, 0, 0); og.fillStyle = "rgba(60,30,10,.16)"; for (let i = 0; i < 300; i++) og.fillRect(Math.random() * c.width, Math.random() * c.height, 2, 2); return o; })(); mapLive(); return;
-  if (D.hint < 3) players().forEach((p, i) => { const px = p.x * k, py = p.y * k, a = p.a; g.fillStyle = i ? "#1a4ab0" : "#b00"; g.beginPath(); g.moveTo(px + Math.cos(a) * k, py + Math.sin(a) * k); g.lineTo(px + Math.cos(a + 2.5) * k * .7, py + Math.sin(a + 2.5) * k * .7); g.lineTo(px + Math.cos(a - 2.5) * k * .7, py + Math.sin(a - 2.5) * k * .7); g.fill(); });
+  if (D.hint < 3) players().forEach((p, i) => { const px = p.x * k, py = p.y * k, a = p.a; g.fillStyle = p === P1 ? "#b00" : PCOL[p.slot ?? 1]; g.beginPath(); g.moveTo(px + Math.cos(a) * k, py + Math.sin(a) * k); g.lineTo(px + Math.cos(a + 2.5) * k * .7, py + Math.sin(a + 2.5) * k * .7); g.lineTo(px + Math.cos(a - 2.5) * k * .7, py + Math.sin(a - 2.5) * k * .7); g.fill(); });
   g.fillStyle = "rgba(60,30,10,.16)"; for (let i = 0; i < 300; i++) g.fillRect(Math.random() * c.width, Math.random() * c.height, 2, 2);
 }
 

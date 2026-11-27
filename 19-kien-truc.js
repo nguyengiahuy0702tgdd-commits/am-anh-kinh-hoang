@@ -57,7 +57,7 @@ function buildFloorMesh(f) {
         if (fh > WH + .01) wallFace(v, X, WH, fh, roomWall);
         if (done.has(key)) continue; done.add(key);
         const rt = [fz, -fx], same = (k) => f.grid[ny + rt[1] * k]?.[nx + rt[0] * k] in STAIRS;
-        buildStairs(v, X, STAIRS[c], !same(-1), !same(1), roomWall); continue;
+        buildStairs(v, X, STAIRS[c], !same(-1), !same(1), roomWall, f, nx, ny); continue;
       }
       const isProp = c in PROP_DEPTH, faceTex = isProp ? roomWall : wallTexAt(c, x, y, nx, ny);
       if (c === "w" && winView(v, f, X, x, y, nx, ny, fh, roomWall)) {} else if (!(f.outdoor && c === "k")) wallFace(v, X, 0, fh, faceTex, STRETCH.has(c));

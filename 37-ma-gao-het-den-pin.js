@@ -48,7 +48,7 @@ function ghostSpeak(text, o = {}) {
 const TORCH_SPOTS = [[8.0, 5.4, 1.14], [31.5, 12, .76], [7.8, 28.2, .93], [19.52, 11, .46], [41, 6, .95], [52, 23.5, 0], [18.5, 24.5, 0], [24, 13.5, 0], [43.5, 13.5, .95], [12.5, 14.5, 0]];
 const _buildHosp = buildHospital;
 buildHospital = function () {
-  _buildHosp(); const a = FLOORS.h1, spots = TORCH_SPOTS.slice().sort(() => Math.random() - .5), n = (typeof COOP !== "undefined" && COOP) ? 2 : 1;
+  _buildHosp(); const a = FLOORS.h1, spots = TORCH_SPOTS.slice().sort(() => Math.random() - .5), n = (NET.on && NET.ok) ? Math.max(1, NET.roster.length) : 1;   // mỗi người một đèn pin
   for (let i = 0; i < n; i++) { const [x, y, h] = spots[i], s = { x, y, k: "r_torchItem", rot: Math.random() * 6.28, base: h * M, act: "torch", reach: 1.6, wide: .3 }; a.sprites.push(s); a.lights.push({ x, y, h: h * M + .08, i: .16, r: .3, g: 1, b: .4, f: 2.2, cond: () => !s.taken }); }
 };
 HOSPITAL.build = buildHospital;
@@ -61,8 +61,8 @@ HOSPITAL.SPRITE_ACTS.torch = s => { s.taken = true; buildFloorMesh(FLOORS.h1); p
   say("Bạn nhặt được một chiếc đèn pin cũ, thân dính máu khô. Bấm F để bật/tắt — pin không còn nhiều đâu."); renderTasks?.(); };
 HOSPITAL.SPRITE_NAMES.torch = "Nhặt đèn pin";
 toggleLight = (o => function (p) { if (MAPID === "hospital" && p && !p.torch) { if (p === P1 && !REMOTE) say("Bạn không có đèn pin. Phải tìm một chiếc trong bóng tối — thử ở quầy, bàn làm việc, xe đẩy dụng cụ..."); return; } return o(p); })(toggleLight);
-hospLive = (o => function (dt) { for (const p of [P1, P2]) if (p && !p.torch) p.lightOn = false; return o(dt); })(hospLive);
-HOSPITAL.GOALS.unshift([() => P1.torch, "Quá tối! Mò tìm một chiếc đèn pin trong khu tiếp nhận tầng 1 (quầy, bàn làm việc, xe đẩy, sàn nhà...). Ánh xanh mờ là mắt kính đèn.", "Tìm đèn pin."]);
+hospLive = (o => function (dt) { for (const p of players()) if (p && !p.torch) p.lightOn = false; return o(dt); })(hospLive);
+// (tìm đèn pin giờ là NHIỆM VỤ PHỤ ở mọi map — xem 63-tim-den-pin.js)
 // ---- Map đặc biệt: độ khó cao hơn mọi cấp ----
 MAPS.hospital.hard = 1; MAPS.hospital.tag = "☠ MAP ĐẶC BIỆT · KHÓ NHẤT · 3 tầng · không có đèn pin khi bắt đầu";
 const _hospStart = HOSPITAL.start;
@@ -71,7 +71,7 @@ HOSPITAL.count = () => D.ghosts + 1;   // luôn thêm một kẻ săn đuổi
 buildMenus = (o => function () { o();
   for (const a of $("mapCards").children) if (MAPS[a.dataset.id]?.hard) { a.classList.add("hardMap"); const b = document.createElement("span"); b.className = "hb"; b.textContent = "☠ KHÓ"; a.appendChild(b); }
   const info = $("mapInfo"); let w = $("hardWarn"); if (!w) { w = document.createElement("div"); w.id = "hardWarn"; info.parentNode.insertBefore(w, info); }
-  const upd = () => { const h = MAPS[MAPID]?.hard; w.style.display = h ? "block" : "none"; w.innerHTML = "☠ <b>MAP ĐẶC BIỆT — ĐỘ KHÓ CAO NHẤT</b><br>Ở mọi cấp độ: Viện trưởng nhanh hơn, thêm một kẻ săn đuổi, ít pin hơn — và bạn bắt đầu <b>không có đèn pin</b>."; };
+  const upd = () => { const h = MAPS[MAPID]?.hard; w.style.display = h ? "block" : "none"; w.innerHTML = "☠ <b>MAP ĐẶC BIỆT — ĐỘ KHÓ CAO NHẤT</b><br>Ở mọi cấp độ: Viện trưởng nhanh hơn, ít pin hơn — và bạn bắt đầu <b>không có đèn pin</b>."; };
   for (const a of $("mapCards").children) a.addEventListener("click", upd); upd();
 })(buildMenus);
 buildMenus();

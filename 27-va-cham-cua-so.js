@@ -193,11 +193,11 @@ const DIFF_TASK = { de: [4, 1], tb: [5, 1.2], kho: [6, 1.5], sieu: [6, 1.8] };
 const TASK_FLOORS2 = { house: ["t1", "t2", "b1"], castle: ["c1", "c3"], forest: ["f1"], cemetery: ["g1"], factory: ["x1"] };
 function setupTasks() {
   TASKS = []; S.mainDone = null; S.pendSpawn = 0; Object.values(FLOORS).forEach(f => { if (!f.dressed) { f.dressed = 1; dressFloor(f); furnishRooms(f); addWebs(f); f.grass = []; const sp = f.sprites; f.sprites = f.grass; growGrass(f); f.sprites = sp; addClutter(f); } }); scaleSolids();
-  const floors = TASK_FLOORS2[MAPID].map(id => FLOORS[id]).filter(f => f && f.w * f.h >= 300), start = (o => ({ f: F.id, x: o.x, y: o.y }))(NET.ok && !NET.host && P2 ? P2 : P1), placed = [];
+  const floors = TASK_FLOORS2[MAPID].map(id => FLOORS[id]).filter(f => f && f.w * f.h >= 300), start = (o => ({ f: F.id, x: o.x, y: o.y }))(COOP && S.spawn0 ? S.spawn0 : P1), placed = [];
   const dk = Object.keys(DIFF).find(k => DIFF[k] === D) || "tb", [nTypes, mul] = DIFF_TASK[dk] || [5, 1];
   const defs = [...TASKDEF[MAPID], ...(TASKX[MAPID] || [])].slice(0, nTypes);
   defs.forEach((d, di) => {
-    const need = Math.max(2, Math.round((TASK_BASE[d.kind] || 3) * mul * (COOP ? 1.6 : 1))), q = { ...d, need, got: 0 }; TASKS.push(q);
+    const need = Math.max(2, Math.round((TASK_BASE[d.kind] || 3) * mul * (1 + .6 * ((COOP ? NET.roster.length : 1) - 1)))), q = { ...d, need, got: 0 }; TASKS.push(q);
     SPRITE_ACTS["task_" + d.id] = s => taskAct(s); SPRITE_NAMES["task_" + d.id] = d.verb;
     for (let i = 0; i < need; i++) {
       const f = floors[(i + di) % floors.length], sp = findSpot(f, placed, start); if (!sp) { q.need--; continue; }
@@ -307,14 +307,14 @@ function extendMaps() {
   const lampL = (f, x, y) => lamp(f, x, y, true);
   if (MAPID === "house") { for (const id of ["t1", "t2"]) annexIndoor(FLOORS[id], 18, i => pick(FLOORS[id], i), lampL); }
   if (MAPID === "factory") annexIndoor(FLOORS.x1, 20, i => { const r = pick(FLOORS.x1, i); return i % 2 ? { ...r, h: 3.6 + Math.random(), ceil: T.ceilInd || r.ceil } : r; }, lampL);
-  if (MAPID === "castle") annexIndoor(FLOORS.c1, 18, i => pick(FLOORS.c1, i), (f, x, y, st) => { f.lights.push({ x, y, h: Math.min(1.2, (st.h ?? WH) - .3), i: .8, r: 1, g: .55, b: .22, f: .55 }); f.sprites.push({ x, y, k: "d_candelabra", rot: 0, solid: .2, deco: 1, seed: Math.random() }); });
+  if (MAPID === "castle" && 0) annexIndoor(FLOORS.c1, 18, i => pick(FLOORS.c1, i), (f, x, y, st) => { f.lights.push({ x, y, h: Math.min(1.2, (st.h ?? WH) - .3), i: .8, r: 1, g: .55, b: .22, f: .55 }); f.sprites.push({ x, y, k: "d_candelabra", rot: 0, solid: .2, deco: 1, seed: Math.random() }); });
   if (MAPID === "forest") annexOutdoor(FLOORS.f1, 26, (f, y0, cs) => {
     for (const [x, y] of cs) { f.sprites.push({ x: x + 2.2, y: y - 1.5, k: "stump", solid: .3, rot: Math.random() * 6 }); if (Math.random() < .7) spr(f, x - 1.5, y + 1, T.battery, .18, { kind: "battery" }); }
     for (let i = 0; i < 30; i++) { const x = 3 + Math.random() * (f.w - 6), y = y0 + Math.random() * 24, cx = Math.floor(x), cy = Math.floor(y); if (f.grid[cy]?.[cx] === "." && !f.path.has(cy * f.w + cx) && !f.sprites.some(s => Math.hypot(s.x - x, s.y - y) < 2)) f.sprites.push({ x, y, k: Math.random() < .75 ? "tree" : "dead", solid: .32, seed: Math.floor(Math.random() * 20) }); }
     f.labels = [...(f.labels || []), ["Bãi chặt cây cũ", cs[0][0], cs[0][1]], ["Khe đá", cs[1][0], cs[1][1]], ["Bãi quạ", cs[2][0], cs[2][1]]];
     f.sprites.push({ x: cs[0][0], y: cs[0][1], k: "bonfire", solid: .5, rot: 0, noSolidify: 1 }); f.lights.push({ x: cs[0][0], y: cs[0][1], h: .4, i: .5, r: 1, g: .5, b: .2, f: .7 });
   });
-  if (MAPID === "cemetery") annexOutdoor(FLOORS.g1, 22, (f, y0, cs) => {
+  if (MAPID === "cemetery" && 0) annexOutdoor(FLOORS.g1, 22, (f, y0, cs) => {
     let n = 0; for (let y = y0 + 3; y < f.h - 3; y += 3) for (let x = 4.5; x < f.w - 4; x += 2.6) { const cx = Math.floor(x), cy = Math.floor(y); if (f.grid[cy]?.[cx] !== "." || f.path.has(cy * f.w + cx) || cs.some(c => Math.hypot(c[0] - x, c[1] - y) < 2.5)) continue; const hh = (cx * 31 + cy * 17) % 7; f.sprites.push({ x, y, k: hh < 4 ? "tomb" : "cross", rot: -Math.PI / 2, solid: .3, seed: hh }); n++; }
     for (const [x, y] of cs) { f.sprites.push({ x: x + 1.2, y, k: "slantern", solid: .25 }); f.lights.push({ x: x + 1.2, y, h: .55, i: .55, r: .9, g: 1, b: .6, f: .9 }); if (Math.random() < .7) spr(f, x - 1.4, y + .8, T.battery, .18, { kind: "battery" }); }
     for (let i = 0; i < 8; i++) { const x = 4 + Math.random() * (f.w - 8), y = y0 + 2 + Math.random() * 18, cx = Math.floor(x), cy = Math.floor(y); if (f.grid[cy]?.[cx] === "." && !f.path.has(cy * f.w + cx) && !f.sprites.some(s => Math.hypot(s.x - x, s.y - y) < 1.8)) f.sprites.push({ x, y, k: "dead", solid: .3, seed: 7 + i }); }

@@ -74,6 +74,7 @@ function buildForest() {
   // Trạm kiểm lâm (nhà gỗ)
   for (let y = 7; y <= 14; y++) for (let x = 38; x <= 46; x++) { f.grid[y][x] = (y === 7 || y === 14 || x === 38 || x === 46) ? "c" : "."; if (f.grid[y][x] === ".") f.room[y * f.w + x] = { wall: T.logWall, floor: T.wood, roof: 1 }; }
   f.grid[14][42] = "d"; f.grid[10][38] = "e"; f.roofs.push([38, 7, 47, 15]);
+  for (let x = 37; x <= 47; x++) { open1(x, 6); open1(x, 15); } for (let y = 6; y <= 15; y++) { open1(37, y); open1(47, y); }   // lối đi vòng quanh trạm (trước đây phía bắc & phía tây bị kẹt, không đọc được chữ trên vách)
   // Kết cấu nền
   f.floorT = [];
   for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {

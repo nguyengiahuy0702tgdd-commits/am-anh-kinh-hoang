@@ -16,7 +16,7 @@ function mapLive() {
   const c = $("mapView"); if (!c || c.classList.contains("hidden") || !c._base) return;
   if (c._f !== F) { toggleMap(true); return; }
   const g = c.getContext("2d"), k = c._k; g.drawImage(c._base, 0, 0); const at = $("areaToast"); if (at) at.style.opacity = 0;
-  if (D.hint < 3) players().forEach((p, i) => { if (p.f && p.f !== F.id) return; mapArrow(g, p, k, i ? "#1a4ab0" : "#b00", (Math.sin(t * 5) + 1) / 2); });
+  if (D.hint < 3) players().forEach((p, i) => { if (p.f && p.f !== F.id) return; mapArrow(g, p, k, p === P1 ? "#b00" : PCOL[p.slot ?? 1], (Math.sin(t * 5) + 1) / 2); });
 }
 
 // ---------- 2. THỜI TIẾT ----------

@@ -447,7 +447,7 @@ function furnishRooms(f) {
   const special = (x, y, r = 1) => { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const c = f.grid[y + dy]?.[x + dx]; if (c && c !== "#" && c !== "." && c !== "I") return true; } return false; };
   const BIG = new Set(["web", "tree", "dead", "tomb", "cross", "willow", "slantern", "rock", "log", "stump", "sign"]);
   const keySpr = f.sprites.filter(s => !s.taken && (s.act || s.kind || s.k === "task" || s.tk || s.t === T.battery || (s.k && !s.deco && !BIG.has(s.k))));
-  const starts = f === F ? [P1, ...(COOP && P2 ? [P2] : [])].map(p => [p.x, p.y]) : [[f.arriveX ?? -99, f.arriveY ?? -99]];   // cùng kết quả trên cả hai máy khi chơi online
+  const starts = f === F ? (COOP && S.spawnPos ? S.spawnPos : players()).map(p => [p.x, p.y]) : [[f.arriveX ?? -99, f.arriveY ?? -99]];   // cùng kết quả trên cả hai máy khi chơi online
   const nearKey = (x, y, r) => keySpr.some(s => Math.hypot(s.x - x, s.y - y) < r) || starts.some(st => Math.hypot(st[0] - x, st[1] - y) < 1.8);
   const placed = [], nearPlaced = (x, y, r) => placed.some(p => Math.hypot(p[0] - x, p[1] - y) < r);
   const roofH = (x, y) => { const r = f.room[idx(x, y)]; return r?.h ?? (f.outdoor ? 6 : WH); };

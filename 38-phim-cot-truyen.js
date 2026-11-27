@@ -4,7 +4,7 @@
 // ---- Ẩn thanh "Đèn pin" ở Bệnh viện cho tới khi nhặt được đèn ----
 hospLive = (o => function (dt) {
   const hide = p => MAPID === "hospital" && p && !p.torch;
-  for (const [id, p] of [["st1", P1], ["st2", P2]]) { const r = $(id)?.querySelector(".bt"); if (r) r.style.display = hide(p) ? "none" : ""; }
+  for (const [id, p] of [["st1", P1], ...MATES.map((m, i) => ["st" + (i + 2), m])]) { const r = $(id)?.querySelector(".bt"); if (r) r.style.display = hide(p) ? "none" : ""; }
   return o(dt);
 })(hospLive);
 

@@ -1,6 +1,6 @@
 // =====================================================================
 //  13. MAP "LÂU ĐÀI BỊ BỎ HOANG"
-//  Nhiệm vụ: 3 mảnh gia huy + cọc bạc → hầm mộ → giết Nữ Bá Tước → cổng thành mở.
+//  Nhiệm vụ: 3 mảnh huy hiệu + cọc bạc → hầm mộ → giết Nữ Bá Tước → cổng thành mở.
 //  Kẻ thù: NỮ BÁ TƯỚC — mù nhưng thính tai: chạy là bị nghe thấy, soi đèn vào là bị phát hiện.
 // =====================================================================
 function stoneWall(g, w, h, base = "#3c3a36") {
@@ -94,16 +94,16 @@ function updateCountess(dt) {
   heartRate = Math.max(320, Math.min(1400, 250 + minGhostD * 150));
 }
 const CASTLE = {
-  NAMES: { L: "Cửa tháp canh", j: "Cầu thang lên tháp", r: "Cầu thang xuống đại sảnh", y: "Cầu thang xuống hầm mộ", x: "Cầu thang lên đại sảnh", s: "Cửa đá gia huy", k: "Cổng thành", B: "Kệ sách",
+  NAMES: { L: "Cửa tháp canh", j: "Cầu thang lên tháp", r: "Cầu thang xuống đại sảnh", y: "Cầu thang xuống hầm mộ", x: "Cầu thang lên đại sảnh", s: "Cửa đá huy hiệu", k: "Cổng thành", B: "Kệ sách",
     h: "Tấm khiên", g: "Lá cờ dòng họ", v: "Cửa sổ kính màu", P: "Chân dung Nữ Bá Tước", W: "Rèm nhung (trốn)", i: "Ngọn đuốc" },
   ACTIONS: {
     j: () => travel("c2", 6, 2.6, Math.PI / 2), r: () => travel("c1", ...FLOORS.c1.remap(16, 2.6), Math.PI / 2), y: () => travel("c3", 13, 2.6, Math.PI / 2), x: () => travel("c1", ...FLOORS.c1.remap(23.5, 2.6), Math.PI / 2),
     L(c) { if (!has("bronzekey")) return say("Cửa lên tháp canh khóa bằng ổ khóa đồng."); F.grid[c.y][c.x] = "."; removeItem("bronzekey"); S.towerOpen = 1; refreshWalls(); noise(.5, 400, .4); say("Cánh cửa đồng rít lên khi mở. Gió lạnh thổi xuống từ đỉnh tháp."); },
     B() { if (S.gotBronze) return say("Những cuốn sách da người... bạn không muốn biết chúng viết gì."); S.gotBronze = 1; addItem("bronzekey", "Chìa khóa đồng"); progress(); say("Sau dãy sách mục, bạn tìm thấy một chiếc chìa khóa đồng. Thẻ treo khắc: THÁP."); },
-    h() { if (S.p1) return say("Chỉ còn lại tấm khiên trống trơn."); S.p1 = 1; S.crest++; addCrest(); progress(); makeNoise(player.x, player.y, 10); noise(.4, 900, .4); say("Bạn gỡ mảnh gia huy khỏi tấm khiên. Tiếng kim loại vang khắp hành lang..."); },
-    s(c) { if (S.crest < 3) return say(`Cửa đá có 3 hốc tròn, đôi mắt đá đỏ ngầu nhìn bạn. (Đã có ${S.crest}/3 mảnh gia huy)`); F.grid[c.y][c.x] = "y"; S.sealOpen = 1; removeItem("crest"); refreshWalls(); noise(1.5, 120, .8, .5); flicker(1.5); say("Ba mảnh gia huy khớp vào cửa đá. Cánh cửa trượt xuống, để lộ cầu thang dẫn vào hầm mộ..."); },
+    h() { if (S.p1) return say("Chỉ còn lại tấm khiên trống trơn."); S.p1 = 1; S.crest++; addCrest(); progress(); makeNoise(player.x, player.y, 10); noise(.4, 900, .4); say("Bạn gỡ mảnh huy hiệu khỏi tấm khiên. Tiếng kim loại vang khắp hành lang..."); },
+    s(c) { if (S.crest < 3) return say(`Cửa đá có 3 hốc tròn, đôi mắt đá đỏ ngầu nhìn bạn. (Đã có ${S.crest}/3 mảnh huy hiệu)`); F.grid[c.y][c.x] = "y"; S.sealOpen = 1; removeItem("crest"); refreshWalls(); noise(1.5, 120, .8, .5); flicker(1.5); say("Ba mảnh huy hiệu khớp vào cửa đá. Cánh cửa trượt xuống, để lộ cầu thang dẫn vào hầm mộ..."); },
     k() { if (S.gateOpen) return winCastle(); say("Song sắt cổng thành hạ xuống chặn lối. Xích kéo cổng nằm sâu dưới lòng đất..."); },
-    g() { say("Lá cờ đỏ thêu gia huy dòng họ Lê Văn: một giọt máu giữa hình thoi vàng."); }, v() { say("Ánh trăng xuyên qua kính màu vẽ một khuôn mặt phụ nữ... đôi mắt kính màu như đang chuyển động."); },
+    g() { say("Lá cờ đỏ thêu huy hiệu dòng họ Lê Văn: một giọt máu giữa hình thoi vàng."); }, v() { say("Ánh trăng xuyên qua kính màu vẽ một khuôn mặt phụ nữ... đôi mắt kính màu như đang chuyển động."); },
     P() { flicker(); say("Chân dung Nữ Bá Tước Lê Thị Huyền, 1847. Bạn chắc chắn lúc nãy bà ta không mỉm cười."); }, W() { hide(); }, i() { say("Ngọn đuốc cháy lép bép, nhưng nó không hề tỏa hơi ấm."); },
   },
   SPRITE_ACTS: {
@@ -115,12 +115,12 @@ const CASTLE = {
       if (S.lit.includes(s.col)) return say("Ngọn nến này đã cháy.");
       S.lit.push(s.col); buildFloorMesh(F); noise(.2, 2000, .2);
       if (S.lit.join("") !== S.order.slice(0, S.lit.length).join("")) { S.lit = []; setTimeout(() => buildFloorMesh(F), 400); makeNoise(player.x, player.y, 30); return jumpScare(() => say("Cả ba ngọn nến phụt tắt cùng lúc! Một tiếng thét vang lên... Sai thứ tự rồi. Nó đã nghe thấy bạn.")); }
-      if (S.lit.length === 3) { S.p2 = 1; S.crest++; addCrest(); progress(); return say("Ba ngọn nến bùng sáng rực. Bệ thờ trượt mở — bên trong là mảnh gia huy thứ hai!"); }
+      if (S.lit.length === 3) { S.p2 = 1; S.crest++; addCrest(); progress(); return say("Ba ngọn nến bùng sáng rực. Bệ thờ trượt mở — bên trong là mảnh huy hiệu thứ hai!"); }
       say("Ngọn nến bùng lên một màu kỳ lạ...");
     },
     bell() { if (S.p3) return say("Quả chuông im lặng... nhưng bạn vẫn nghe thấy dư âm của nó."); S.p3 = 1; S.crest++; addCrest(); progress(); for (let i = 0; i < 4; i++) { tone(110, i * 1.6, 3, .2, "sine"); tone(110 * 2.76, i * 1.6, 2, .06, "sine"); }
       for (const g of ghosts) { g.arrive = t + 5; if (g.floor === F.id) { g.hx = player.x; g.hy = player.y; g.hunt = t + 12; } } if (!S.woke) wakeGhosts();
-      say("Bạn gỡ mảnh gia huy treo trong lòng chuông — quả chuông đổ hồi vang dội khắp lâu đài! NÓ ĐANG ĐẾN. Trốn ngay!"); },
+      say("Bạn gỡ mảnh huy hiệu treo trong lòng chuông — quả chuông đổ hồi vang dội khắp lâu đài! NÓ ĐANG ĐẾN. Trốn ngay!"); },
     coffin() {
       if (S.dead) return say("Thân xác Nữ Bá Tước đã hóa tro.");
       if (!has("stake")) return say("Quan tài khảm vàng, nặng trịch. Bên trong có tiếng thở... và tiếng móng tay cào. Bạn cần thứ gì đó để kết liễu bà ta.");
@@ -131,9 +131,9 @@ const CASTLE = {
   SPRITE_NAMES: { lore: "Biên niên sử", plate: "Nắp chuông bạc", chest: "Rương sắt", cand: "Chân nến kính màu", bell: "Chuông đồng", coffin: "Quan tài Nữ Bá Tước" },
   GOALS: [
     [() => S.lore, "Đọc cuốn biên niên sử trên bàn trong thư viện (phía tây bắc).", "Tìm hiểu lịch sử lâu đài."],
-    [() => S.crest >= 3 || S.sealOpen, () => `Thu thập 3 mảnh gia huy (${S.crest}/3): khiên ở kho vũ khí · nến nhà nguyện theo thứ tự ${S.order.map(c => ({ R: "Đỏ", B: "Lam", G: "Lục" })[c]).join("→")} · chuông trên tháp (chìa khóa đồng ở thư viện).`, () => `Thu thập 3 mảnh gia huy (${S.crest}/3).`],
+    [() => S.crest >= 3 || S.sealOpen, () => `Thu thập 3 mảnh huy hiệu (${S.crest}/3): khiên ở kho vũ khí · nến nhà nguyện theo thứ tự ${S.order.map(c => ({ R: "Đỏ", B: "Lam", G: "Lục" })[c]).join("→")} · chuông trên tháp (chìa khóa đồng ở thư viện).`, () => `Thu thập 3 mảnh huy hiệu (${S.crest}/3).`],
     [() => has("stake") || S.dead, "Tìm chìa khóa rương dưới nắp chuông bạc ở phòng ăn, rồi mở rương ở kho vũ khí.", "Tìm vũ khí để kết liễu Nữ Bá Tước."],
-    [() => S.sealOpen, "Đặt 3 mảnh gia huy vào cửa đá ở phòng ngai vàng.", "Mở cửa đá gia huy."],
+    [() => S.sealOpen, "Đặt 3 mảnh huy hiệu vào cửa đá ở phòng ngai vàng.", "Mở cửa đá huy hiệu."],
     [() => S.dead, "Xuống hầm mộ, đóng cọc bạc vào quan tài lớn.", "Kết liễu Nữ Bá Tước."],
     [() => false, "Ra cổng thành ở cuối đại sảnh.", "Thoát khỏi lâu đài."],
   ],
@@ -141,6 +141,6 @@ const CASTLE = {
   intro: "Cánh cổng lâu đài sập xuống sau lưng bạn. Trong bóng tối, có tiếng váy lụa sột soạt trên sàn đá... Đừng chạy. Bà ta nghe được mọi thứ.",
   whispers: ["...ta nghe thấy ngươi...", "...máu... ấm quá...", "...lại gần đây...", "...gia nhân của ta...", "...đừng thở mạnh thế..."],
 };
-function addCrest() { removeItem("crest"); addItem("crest", `Mảnh gia huy ×${S.crest}`); }
+function addCrest() { removeItem("crest"); addItem("crest", `Mảnh huy hiệu ×${S.crest}`); }
 function addItemOnce(k, n, r) { if (!has(k)) addItem(k, n, r); }
 function winCastle() { endWin("THOÁT KHỎI LÂU ĐÀI", "Bạn bước qua cổng thành. Phía sau, ngọn đuốc cuối cùng trong lâu đài phụt tắt.<br><br><i>Trên cổ bạn... có hai vết châm nhỏ mà bạn không nhớ đã có từ lúc nào.</i>"); }

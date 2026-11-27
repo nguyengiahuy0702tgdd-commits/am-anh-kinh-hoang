@@ -28,7 +28,7 @@ function buildCemeteryTextures() {
 const CEM_NAMES = ["Nguyễn Thị Lan|1962 – 1987", "Trần Thị Lan|1959 – 1987", "Nguyễn Thị Lành|1962 – 1988"];
 const DECOY_NAMES = ["Phạm Văn Tư|1931 – 1979", "Lê Thị Hoa|1940 – 1993", "Đỗ Văn Minh|1955 – 1987", "Vô danh|? – 1975", "Hoàng Thị Mai|1928 – 1981", "Bé Thảo|1984 – 1990", "Ngô Văn Sáu|1937 – 1987", "Lý Thị Bảy|1946 – 1999"];
 function buildCemetery() {
-  fseed = 909; const f = makeFloor("g1", "Nghĩa Trang", 64, 48, T.ceilBeam, T.mausW, T.grass, .025);
+  fseed = 909; const f = makeFloor("g1", "Nghĩa Trang", 49, 48, T.ceilBeam, T.mausW, T.grass, .025);
   Object.assign(f, { outdoor: 1, edge: "fence", roofs: [], path: new Set(), sky: T.sky2, fogC: FOG_CEM, fogD: .0075, moonC: [.07, .085, .08] });
   for (let y = 2; y <= 45; y++) for (let x = 2; x <= f.w - 3; x++) { const R = 7, cx = x + .5, cy = y + .5, qx = Math.max(0, 2 + R - cx, cx - (f.w - 2 - R)), qy = Math.max(0, 2 + R - cy, cy - (46 - R)); if (Math.hypot(qx, qy) <= R) f.grid[y][x] = "."; }
   for (let y = 3; y <= 45; y++) for (const x of [23, 24]) f.path.add(y * f.w + x); for (let x = 3; x <= f.w - 4; x++) for (const y of [23, 24]) f.path.add(y * f.w + x);
@@ -38,9 +38,7 @@ function buildCemetery() {
   // Nhà người gác mộ
   for (let y = 34; y <= 40; y++) for (let x = 36; x <= 42; x++) { const wall = y === 34 || y === 40 || x === 36 || x === 42; f.grid[y][x] = wall ? "c" : "."; if (!wall) f.room[y * f.w + x] = { wall: T.logWall, floor: T.wood, roof: 1 }; }
   f.grid[34][39] = "."; f.room[34 * f.w + 39] = { wall: T.logWall, floor: T.wood, roof: 1 }; f.roofs.push([36, 34, 43, 41, T.roof, T.logWall]);
-  // Nhà xác
-  for (let y = 5; y <= 12; y++) for (let x = 50; x <= 58; x++) { const wall = y === 5 || y === 12 || x === 50 || x === 58; f.grid[y][x] = wall ? "c" : "."; if (!wall) f.room[y * f.w + x] = { wall: T.mausW, floor: T.marble, roof: 1 }; }
-  f.grid[12][54] = "."; f.room[12 * f.w + 54] = { wall: T.mausW, floor: T.marble, roof: 1 }; f.roofs.push([50, 5, 59, 13, T.stoneRoof, T.mausW]);
+  // (Nhà xác phía đông đã bỏ — map gọn lại cho đỡ đi lòng vòng)
   // Nhà thờ lớn kiểu gothic
   for (let y = 3; y <= 14; y++) for (let x = 30; x <= 43; x++) { const wall = y === 3 || y === 14 || x === 30 || x === 43; f.grid[y][x] = wall ? "m" : "."; if (!wall) f.room[y * f.w + x] = { wall: T.mausW, floor: T.marble, roof: 1, h: 4.6, ceil: T.ceilVault }; }
   f.grid[14][37] = "f"; f.roofs.push([30, 3, 44, 15, T.stoneRoof, T.mausW, 4.6, [37, 12.5]]); f.charH = { m: 4.6, v: 4.6, f: 4.6, c: WH };
@@ -65,8 +63,6 @@ function buildCemetery() {
   // Trong nhà gác mộ
   f.sprites.push({ x: 39.5, y: 37.7, mesh: "table", solid: .95 }); K(39.2, 37.6, "book", { base: .76, act: "clog", reach: 1.9 }); K(40.3, 37.8, "lantern", { base: .76 }); f.lights.push({ x: 40.3, y: 37.8, h: 1, i: .8, r: 1, g: .7, b: .35 });
   K(37.6, 39.2, "shovel", { act: "shovel", reach: 1.7 }); K(41.3, 35.9, "mapboard", { act: "cmap", rot: Math.PI, reach: 1.8 });
-  [[52.2, 7.5], [56, 7.5], [52.2, 10.2], [56, 10.2]].forEach(([x, y]) => K(x, y, "coffin", { rot: 0, solid: .5 })); f.lights.push({ x: 54, y: 9, h: .9, i: .35, r: .6, g: .9, b: .7, f: .8 });
-  f.labels.push(["Nhà xác", 54, 3.6], ["Khu mộ mới", 54, 30]);
   // Trong nhà thờ
   K(36.5, 4.8, "altarStone", { act: "altar2", rot: Math.PI / 2, reach: 2, wide: .5, solid: .7 }); f.lights.push({ x: 36.5, y: 5.4, h: .9, i: .8, r: 1, g: .55, b: .25 });
   for (const y of [8, 9.6, 11.2, 12.6]) for (const x of [35, 38.5]) K(x, y, "pew", { rot: -Math.PI / 2, solid: .6 });

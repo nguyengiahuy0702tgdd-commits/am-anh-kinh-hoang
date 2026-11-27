@@ -201,7 +201,7 @@ const MAPS = {
   forest:   { name: "Trong Rừng", tag: "Rừng thông lúc nửa đêm", ready: 1, bg: "linear-gradient(160deg,#0c1a10,#020604 70%)",
               desc: "Xe chết máy ở bìa rừng. Đốt 5 búp bê rơm ở lửa trại, tìm xăng ở trạm kiểm lâm rồi lái xe thoát ra. Ma Rừng chỉ tiến lại khi bạn không nhìn nó — nhưng ở gần mà nhìn lâu sẽ mất trí." },
   castle:   { name: "Lâu Đài Bị Bỏ Hoang", tag: "Lâu đài 3 tầng · thế kỷ 19", ready: 1, bg: "linear-gradient(160deg,#1e1428,#050308 70%)",
-              desc: "Tìm 3 mảnh gia huy (khiên, nến kính màu, chuông tháp) và cọc bạc, mở hầm mộ và kết liễu Nữ Bá Tước. Bà ta mù nhưng nghe được mọi thứ — ĐỪNG CHẠY, trốn sau rèm nhung." },
+              desc: "Tìm 3 mảnh huy hiệu (khiên, nến kính màu, chuông tháp) và cọc bạc, mở hầm mộ và kết liễu Nữ Bá Tước. Bà ta mù nhưng nghe được mọi thứ — ĐỪNG CHẠY, trốn sau rèm nhung." },
   cemetery: { name: "Nghĩa Trang Lúc 0h Đêm", tag: "Ngoài trời · hạn chót 3 giờ sáng", ready: 1, bg: "linear-gradient(160deg,#18221e,#030507 70%)",
               desc: "Tìm đúng mộ cô Lan dưới gốc liễu (đọc kỹ tên!), đào lấy chiếc lược ngà và đặt lên bàn thờ trong nhà thờ lớn. Vong hồn bay lơ lửng, xuyên qua bia mộ và ngày càng đông. Phải thoát ra trước 3 giờ sáng." },
   factory:  { name: "Nhà Máy Xí Nghiệp", tag: "Xưởng dệt bỏ hoang · ca đêm", ready: 1, bg: "linear-gradient(160deg,#2a1a0a,#070402 70%)",

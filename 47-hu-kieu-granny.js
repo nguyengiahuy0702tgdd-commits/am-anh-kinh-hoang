@@ -67,7 +67,7 @@ function grHit() {                // BỐP! + ù tai
 // Hù khi giải đố: chỉ lao vào mặt + thét, rồi trả lại đúng nhịp cũ (~1,1 giây).
 jumpScare = (orig => function (after) {
   const who = player;
-  if (REMOTE || (NET.ok && NET.host && who === P2) || GR.on) return orig(after);
+  if (REMOTE || (NET.ok && NET.host && who !== P1) || GR.on) return orig(after);
   const caught = who.invuln >= 1.9 && hurt === 1;
   let g = null, gd = 99;
   for (const q of ghosts) if (q.floor === F.id && q.rise !== 0) { const d = Math.hypot(q.x - who.x, q.y - who.y); if (d < gd) { gd = d; g = q; } }

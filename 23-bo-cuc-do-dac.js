@@ -24,7 +24,7 @@ function relayout(f, W, H, blocks) {
 const shut = (f, list) => list.forEach(([x, y]) => f.grid[y][x] = "#");
 // Lâu đài: hành lang trục dọc ở giữa, phòng hai bên, đại sảnh nằm cuối trục (kiểu chữ T)
 function castleLayout(a) {
-  relayout(a, 57, 49, [
+  relayout(a, 42, 49, [   // (đã bỏ phòng tra tấn & khu mở rộng → lâu đài gọn hơn ~40%)
     { r: [12, 14, 27, 30], to: [20, 31] },   // đại sảnh
     { r: [1, 1, 12, 11], to: [15, 2] },      // thư viện
     { r: [12, 1, 19, 11], to: [7, 2] },      // cầu thang tháp
@@ -32,12 +32,11 @@ function castleLayout(a) {
     { r: [19, 1, 27, 11], to: [29, 2] },     // phòng ngai vàng
     { r: [27, 1, 38, 11], to: [37, 2] },     // kho vũ khí
     { r: [27, 14, 38, 30], to: [29, 14] },   // phòng ăn
-    { r: [39, 15, 53, 29], to: [41, 15] },   // phòng tra tấn
   ]);
   room(a, 27, 3, 28, 30, [T.stoneW, T.stoneWB], T.carpet, 2.3, T.ceilVault);
   room(a, 9, 13, 14, 14, [T.stoneW, T.stoneWB], T.flag, 1.8);
   shut(a, [[21, 12], [21, 13], [33, 12], [42, 12], [34, 14]]);
-  open(a, [[26, 7], [26, 21], [29, 7], [29, 21], [37, 7], [15, 14], [40, 22]]);
+  open(a, [[26, 7], [26, 21], [29, 7], [29, 21], [37, 7], [15, 14]]);
   a.labels.push(["Hành lang chính", 27.5, 18], ["Lối lên tháp", 11.5, 13.5]);
   [[26, 11], [26, 27], [29, 11], [29, 27], [26, 4], [29, 4]].forEach(([x, y]) => torchAt(a, x, y));
   [[27.5, 9], [27.5, 17], [27.5, 25]].forEach(([x, y]) => a.lights.push({ x, y, h: 1.6, i: .45, r: 1, g: .5, b: .22, f: .5 }));

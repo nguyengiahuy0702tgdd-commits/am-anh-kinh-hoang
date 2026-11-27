@@ -18,7 +18,7 @@ function spiderBody(v, X, walk, hang) {
 function spiderModel(v, x, y, z, k, face, walk, hang) { const f = facing(face); spiderBody(v, XF(x, y, z, f.c, f.s, k), walk, hang); }
 function camBasis() {
   const p = P1.pitch, a = P1.a, fw = [Math.cos(p) * Math.cos(a), Math.sin(p), Math.cos(p) * Math.sin(a)];
-  return { eye: [P1.x, EYE + eyeOff(P1) + Math.sin(P1.bob) * .025, P1.y], fw };
+  return { eye: [P1.x, EYE + eyeOff(P1) + (P1.climb || 0) + Math.sin(P1.bob) * .025, P1.y], fw };
 }
 // Trạng thái mới: "leap" (bật về phía mặt) → "face" (úp lên mặt) → "off" (bị gỡ ra, rơi xuống, bò đi)
 

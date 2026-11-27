@@ -100,7 +100,7 @@ function butcherModel(v, g) {
 // Người chơi còn lại
 function survivorModel(v, p) {
   const { c, s } = facing(p.a), base = XF(p.x, (p.jy || 0) - (p.crH || 0) * .14, p.y, c, s, .46), X = p.dead ? XL(base, 0, .05, 0, -1.45, 0) : base, sw = Math.sin(p.bob * .5) * (p.running ? .55 : .35) * (p.moving ? 1 : 0);
-  humanoid(v, X, { skin: T.skinA, face: T.faceA, top: T.coatT, bottom: T.jeansT, hair: T.hairT, prop: p.lightOn && !p.dead ? "torch" : null }, { sw, ph: p.bob * .5, armR: -1.3, elR: -.1, knee: (p.crH || 0) * 1.1, hunch: (p.crH || 0) * .3 });
+  humanoid(v, X, { skin: T.skinA, face: T.faceA, top: (p.slot != null && T["coatS" + p.slot]) || T.coatT, bottom: T.jeansT, hair: T.hairT, prop: p.lightOn && !p.dead ? "torch" : null }, { sw, ph: p.bob * .5, armR: -1.3, elR: -.1, knee: (p.crH || 0) * 1.1, hunch: (p.crH || 0) * .3 });
 }
 
 // ---- Texture cho người sống (phim mở đầu & người chơi) ----
@@ -278,7 +278,7 @@ function renderView(vx, vw, dt, cam) {
   if (cam) { eye = cam.eye; fw = cam.fw; }
   else {
     const p = player.pitch, a = player.a; fw = [Math.cos(p) * Math.cos(a), Math.sin(p), Math.cos(p) * Math.sin(a)];
-    eye = [player.x, (player.dead ? .18 : EYE) + Math.sin(player.bob) * .025 - (player.hidden ? .05 : 0) + eyeOff(player) + (player === P1 ? CAM4D.ey : 0), player.y];
+    eye = [player.x, (player.dead ? .18 : EYE) + Math.sin(player.bob) * .025 - (player.hidden ? .05 : 0) + eyeOff(player) + (player.climb || 0) + (player === P1 ? CAM4D.ey : 0), player.y];
     if (myScare) { eye[0] += (Math.random() - .5) * .03; eye[1] += (Math.random() - .5) * .03; eye[2] += (Math.random() - .5) * .03; }
   }
   const VP = mul(persp(2 * Math.atan(Math.tan((cam ? 66 : SET.hfov + FX.fov) * Math.PI / 360) / asp), asp, .03, far), lookAtR(eye, fw, cam ? 0 : CAM4D.roll));
