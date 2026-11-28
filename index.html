@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ám Ảnh Kinh Hoàng</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a0303">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ám Ảnh">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
@@ -9910,6 +9918,29 @@ function gunView(v) {
   gunModel(v, X, kt < .07 ? 1 - kt / .07 : 0); handModel(v, X);
 }
 swayMeshes = (o => function (v) { o(v); try { gunView(v); } catch (e) {} })(swayMeshes);
+</script>
+<script>
+// ===== js/65-ung-dung.js =====
+// =====================================================================
+//  65. CÀI GAME THÀNH ỨNG DỤNG (PWA)
+//  Có biểu tượng riêng, mở là vào thẳng game ở cửa sổ riêng (không thanh địa chỉ).
+//  Nút "Cài ứng dụng" hiện trong menu chính khi trình duyệt cho phép cài.
+// =====================================================================
+const APP = { ev: null, standalone: matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches || navigator.standalone === true };
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+(function appBtn() {
+  const nav = document.querySelector("#menu .mnav"); if (!nav || APP.standalone || location.protocol === "file:") return;
+  const a = document.createElement("a"); a.id = "btnApp"; a.textContent = "Cài ứng dụng"; nav.appendChild(a);
+  a.onclick = async () => {
+    if (APP.ev) { APP.ev.prompt(); const r = await APP.ev.userChoice.catch(() => null); APP.ev = null; if (r && r.outcome === "accepted") a.remove(); return; }
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), edge = /Edg\//.test(navigator.userAgent);
+    toast(ios ? "iPhone/iPad: mở bằng Safari → bấm nút Chia sẻ (ô vuông có mũi tên) → \"Thêm vào MH chính\"."
+      : edge ? "Edge: bấm dấu ··· góc trên phải → Ứng dụng → \"Cài đặt trang web này dưới dạng ứng dụng\"."
+      : "Chrome: bấm biểu tượng cài đặt (màn hình có mũi tên) ở cuối thanh địa chỉ, hoặc ⋮ → Truyền, lưu và chia sẻ → Cài đặt trang dưới dạng ứng dụng.");
+  };
+})();
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); APP.ev = e; });
+addEventListener("appinstalled", () => { APP.ev = null; $("btnApp")?.remove(); try { toast("Đã cài xong! Từ giờ mở game bằng biểu tượng \"Ám Ảnh\" trên máy."); } catch (e) {} });
 </script>
 </body>
 </html>

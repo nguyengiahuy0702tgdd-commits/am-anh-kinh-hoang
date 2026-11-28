@@ -1,0 +1,19 @@
+{
+  "name": "Ám Ảnh Kinh Hoàng",
+  "short_name": "Ám Ảnh",
+  "description": "Game kinh dị giải đố 3D góc nhìn thứ nhất — 6 map, chơi 1–4 người.",
+  "lang": "vi",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#0a0303",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
